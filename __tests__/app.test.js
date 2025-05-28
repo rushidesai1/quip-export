@@ -167,7 +167,8 @@ describe('main() tests', () => {
                 documentCSS: documentCSS,
                 embeddedImages: true,
                 comments: true,
-                docx: true
+                docx: true,
+                fileExistsCallback: expect.any(Function)
             }
         );
         expect(app.quipProcessor.setLogger).toHaveBeenCalledWith(app.Logger);
@@ -282,6 +283,28 @@ describe('fileSaver() tests', () => {
         };
         app.fileSaver(blob, fileName, 'NOT-BLOB', filePath);
         expect(Utils.writeTextFile).toHaveBeenCalledWith(path.join(app.desinationFolder, "quip-export", filePath, fileName), blob);
+    });
+});
+
+describe('fileExists() tests', () => {
+    const fileName = 'aaa.html';
+    const filePath = '/some/path';
+
+    beforeEach(() => {
+        app = new App();
+        app.desinationFolder = 'c:/temp';
+    });
+
+    test('zip mode always false', async () => {
+        app.cliArguments = {zip: true};
+        expect(app.fileExists(fileName, filePath)).toBe(false);
+    });
+
+    test('file exists on disk', async () => {
+        app.cliArguments = {zip: false};
+        fs.existsSync = jest.fn(() => true);
+        expect(app.fileExists(fileName, filePath)).toBe(true);
+        expect(fs.existsSync).toHaveBeenCalledWith(path.join('c:/temp', 'quip-export', filePath, fileName));
     });
 });
 
