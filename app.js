@@ -56,6 +56,16 @@ class App {
     }
 
     /*
+    check if file already exists in destination
+    */
+    fileExists(fileName, filePath) {
+        if(this.cliArguments.zip) {
+            return false;
+        }
+        return fs.existsSync(path.join(this.desinationFolder, "quip-export", filePath, fileName));
+    }
+
+    /*
     callback-function for progress indication
     */
     progressFunc(progress) {
@@ -167,7 +177,8 @@ class App {
                 documentCSS: this.cliArguments['embedded-styles']? documentCSS : '',
                 embeddedImages: this.cliArguments['embedded-images'],
                 comments: this.cliArguments['comments'],
-                docx: this.cliArguments['docx']
+                docx: this.cliArguments['docx'],
+                fileExistsCallback: this.fileExists.bind(this)
             });
 
         this.quipProcessor.setLogger(this.Logger);
